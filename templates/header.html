@@ -1,0 +1,94 @@
+<!-- Скрипти для роботи з темою -->
+<script>
+    // Реєстрація Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/static/js/sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
+
+    // Функція для роботи з cookies
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    // Функція для отримання системної теми
+    function getSystemTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // Функція для встановлення теми
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (document.getElementById('theme-toggle')) {
+            document.getElementById('theme-toggle').checked = theme === 'dark';
+        }
+        setCookie('theme', theme, 365); // Зберігаємо тему на рік
+    }
+
+    // Застосування початкової теми
+    const savedTheme = getCookie('theme');
+    const systemTheme = getSystemTheme();
+    const initialTheme = savedTheme || systemTheme;
+    setTheme(initialTheme);
+
+    // Слідкування за зміною системної теми
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!getCookie('theme')) {
+            setTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+</script>
+
+<!-- Навігаційна панель -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/">SpiriWile</a>
+        <div class="d-flex align-items-center">
+            <button id="debug-holiday" class="btn btn-sm btn-outline-primary me-2 d-none" style="font-size: 1.2rem;" title="Активувати святковий режим">🎉</button>
+            <label class="theme-switch" title="Змінити тему">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+            <button class="navbar-toggler ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Головна</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rules">Правила</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/architecture">Архітектура</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav> 

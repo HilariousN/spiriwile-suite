@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  spiriwile:
+    image: spiriwile
+    build: .
+    container_name: spiriwile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ${CASAOS_APP_PATH}/data:/app/data
+      - ${CASAOS_APP_PATH}/static:/app/static
+      - ${CASAOS_APP_PATH}/templates:/app/templates
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "casaos.description=SpiriWile - Український Minecraft сервер"
+      - "casaos.service=SpiriWile"
+      - "casaos.icon=https://raw.githubusercontent.com/strawspirit/spiriwile/main/static/images/logo.png"
+      - "casaos.web.port=80"
+      - "casaos.web.protocol=http"
+
+volumes:
+  data:
+    driver: local
+  static:
+    driver: local
+  templates:
+    driver: local
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  main: spiriwile
+  title:
+    en_us: SpiriWile Minecraft Server
+    uk_ua: SpiriWile Minecraft Сервер
+  icon: https://raw.githubusercontent.com/strawspirit/spiriwile/main/static/images/logo.png
+  tagline:
+    en_us: Ukrainian Minecraft Server
+    uk_ua: Український Minecraft сервер
+  description:
+    en_us: SpiriWile is a unique Ukrainian Minecraft server where every player can create their own story
+    uk_ua: SpiriWile - це унікальний український сервер, де кожен гравець може створити свою історію
+  developer: StrawSpirit Studio
+  category: Gaming
+  port_map: "80:5000/tcp" 

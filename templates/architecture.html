@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Архітектура - SpiriWile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        // Реєстрація Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/js/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Функція для роботи з cookies
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (document.getElementById('theme-toggle')) {
+                document.getElementById('theme-toggle').checked = theme === 'dark';
+            }
+            setCookie('theme', theme, 365);
+        }
+
+        const savedTheme = getCookie('theme');
+        const systemTheme = getSystemTheme();
+        const initialTheme = savedTheme || systemTheme;
+        setTheme(initialTheme);
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!getCookie('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">SpiriWile</a>
+            <div class="d-flex align-items-center">
+                <button id="debug-holiday" class="btn btn-sm btn-outline-primary me-2 d-none" style="font-size: 1.2rem;" title="Активувати святковий режим">🎉</button>
+                <label class="theme-switch" title="Змінити тему">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <button class="navbar-toggler ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Головна</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/rules">Правила</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/architecture">Архітектура</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://send.monobank.ua/jar/6YcXYdsKaR" target="_blank">Банка</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="architecture-section">
+        <div class="container">
+            <h1 class="section-title text-center">Архітектура серверу</h1>
+            
+            <div class="architecture-container">
+                <div class="architecture-item">
+                    <h2>Основні компоненти 🔧</h2>
+                    <div class="architecture-diagram">
+                        <div class="diagram-item">
+                            <h3>Веб-сервер 🌐</h3>
+                            <ul>
+                                <li>Flask (Python) 🐍</li>
+                                <li>Service Worker 📦</li>
+                                <li>Bootstrap 🎨</li>
+                            </ul>
+                        </div>
+                        <div class="diagram-item">
+                            <h3>Сервер MC ⛏️</h3>
+                            <ul>
+                                <li>Java (Purpur) ☕</li>
+                                <li>Bedrock (Geyser) 📱</li>
+                                <li>Оптимізація ⚡</li>
+                            </ul>
+                        </div>
+                        <div class="diagram-item">
+                            <h3>Безпека 🛡️</h3>
+                            <ul>
+                                <li>DDoS захист 🚫</li>
+                                <li>Античіт 🎮</li>
+                                <li>Бекапи 💾</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="architecture-item">
+                    <h2>Технічні деталі ⚙️</h2>
+                    <div class="tech-details">
+                        <div class="detail-card">
+                            <h3>Хостинг 🖥️</h3>
+                            <p>Сервер з оптимізацією для MC:</p>
+                            <ul>
+                                <li>SSD 240 GB 💨</li>
+                                <li>HDD 1 TB 💿</li>
+                                <li>CPU: 4 ядра 🔄</li>
+                                <li>RAM: 8 GB 🎯</li>
+                                <li>DDoS захист 🛡️</li>
+                            </ul>
+                        </div>
+                        <div class="detail-card">
+                            <h3>Оптимізація ⚡</h3>
+                            <p>Налаштування для продуктивності:</p>
+                            <ul>
+                                <li>Purpur ядро 🚀</li>
+                                <li>Pterodactyl 🎛️</li>
+                                <li>Кешування 📦</li>
+                                <li>Редстоун ⚡</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="architecture-item">
+                    <h2>Плагіни 🔌</h2>
+                    <div class="plugins-grid">
+                        <div class="plugin-card">
+                            <h3>SMP режим 🌍</h3>
+                            <p>Класичне виживання з розширеними можливостями.</p>
+                        </div>
+                        <div class="plugin-card">
+                            <h3>Клани ⚔️</h3>
+                            <p>Система кланів з територіями та війнами.</p>
+                        </div>
+                        <div class="plugin-card">
+                            <h3>Регіони 🏰</h3>
+                            <p>Захист територій з налаштуванням прав.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>Проект керується StrawSpirit Studio</p>
+                    <p>&copy; 2025 SpiriWile. Всі права захищені.</p>
+                </div>
+                <div class="footer-center">
+                    <div class="social-links">
+                        <a href="https://discord.gg/RhYHdDhh5y" target="_blank">Discord</a>
+                        <a href="https://t.me/spiriwile" target="_blank">Telegram</a>
+                        <a href="https://www.tiktok.com/@spiriwile" target="_blank">TikTok</a>
+                    </div>
+                </div>
+                <div class="footer-right">
+                    <p><span class="copy-ip" onclick="copyToClipboard('spiriwile.duckdns.org')" title="Натисніть щоб скопіювати">IP: spiriwile.duckdns.org</span></p>
+                    <p id="server-version">Версія: Завантаження...</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-left, .footer-center, .footer-right {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-left {
+            text-align: left;
+        }
+
+        .footer-center {
+            text-align: center;
+        }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        .footer-left p, .footer-right p {
+            margin: 5px 0;
+            color: var(--text-secondary);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-left, .footer-center, .footer-right {
+                text-align: center;
+                width: 100%;
+            }
+        }
+
+        .copy-ip {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .copy-ip:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .tooltip {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            animation: fadeInOut 2s ease;
+            z-index: 1000;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            15% { opacity: 1; transform: translate(-50%, 0); }
+            85% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        .footer-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            document.body.classList.add('loaded');
+            setTimeout(() => {
+                document.querySelector('.loader-wrapper').classList.add('loader-hidden');
+            }, 500);
+        });
+
+        // Функція копіювання в буфер обміну
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = 'Скопійовано!';
+                document.body.appendChild(tooltip);
+                
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 2000);
+            });
+        }
+
+        // Отримання версії сервера
+        fetch('https://api.mcsrvstat.us/2/spiriwile.duckdns.org')
+            .then(response => response.json())
+            .then(data => {
+                if (data.version) {
+                    document.getElementById('server-version').textContent = `Версія: ${data.version}`;
+                }
+            })
+            .catch(() => {
+                document.getElementById('server-version').textContent = 'Версія: Java/Bedrock 1.20.4';
+            });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const debugHolidayBtn = document.getElementById('debug-holiday');
+            
+            // Показуємо дебаг кнопку тільки якщо є параметр pascha=true
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('pascha') === 'true') {
+                debugHolidayBtn.classList.remove('d-none');
+            }
+            
+            function addVisibleClass(element) {
+                if (element && !element.classList.contains('visible')) {
+                    element.classList.add('visible');
+                }
+            }
+
+            // Активація початкових анімацій
+            setTimeout(() => {
+                addVisibleClass(document.querySelector('.navbar'));
+                addVisibleClass(document.querySelector('.architecture-section'));
+            }, 100);
+
+            // Налаштування спостерігача для анімацій при прокручуванні
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            // Єдиний спостерігач для всіх анімацій
+            const mainObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // Спостерігаємо за основними елементами
+            document.querySelectorAll('.architecture-item, .section-title').forEach(element => {
+                mainObserver.observe(element);
+            });
+
+            // Анімація для діаграм
+            const animateDiagrams = () => {
+                const diagrams = document.querySelectorAll('.diagram-item');
+                diagrams.forEach((diagram, index) => {
+                    diagram.style.opacity = '0';
+                    diagram.style.transform = 'translateY(20px)';
+                    diagram.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    diagram.style.transitionDelay = `${index * 0.2}s`;
+                    setTimeout(() => {
+                        diagram.style.opacity = '1';
+                        diagram.style.transform = 'translateY(0)';
+                    }, 100 + index * 200);
+                });
+            };
+
+            // Анімація для технічних деталей
+            const animateDetails = () => {
+                const details = document.querySelectorAll('.detail-card');
+                details.forEach((detail, index) => {
+                    detail.style.opacity = '0';
+                    detail.style.transform = 'translateX(-20px)';
+                    detail.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    detail.style.transitionDelay = `${index * 0.2}s`;
+                    setTimeout(() => {
+                        detail.style.opacity = '1';
+                        detail.style.transform = 'translateX(0)';
+                    }, 300 + index * 200);
+                });
+            };
+
+            // Анімація для плагінів
+            const animatePlugins = () => {
+                const plugins = document.querySelectorAll('.plugin-card');
+                plugins.forEach((plugin, index) => {
+                    plugin.style.opacity = '0';
+                    plugin.style.transform = 'scale(0.9)';
+                    plugin.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    plugin.style.transitionDelay = `${index * 0.15}s`;
+                    setTimeout(() => {
+                        plugin.style.opacity = '1';
+                        plugin.style.transform = 'scale(1)';
+                    }, 500 + index * 150);
+                });
+            };
+
+            // Запуск анімацій
+            setTimeout(() => {
+                animateDiagrams();
+                animateDetails();
+                animatePlugins();
+            }, 200);
+
+            // Обробник перемикання теми
+            themeToggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+            themeToggle.addEventListener('change', () => {
+                const newTheme = themeToggle.checked ? 'dark' : 'light';
+                setTheme(newTheme);
+            });
+
+            // Функція для перевірки святкових дат
+            function checkHoliday() {
+                const today = new Date();
+                const day = today.getDate();
+                const month = today.getMonth() + 1;
+                const debugMode = sessionStorage.getItem('holiday-debug');
+
+                // Перевірка дебаг режиму
+                if (debugMode === 'easter') {
+                    document.documentElement.setAttribute('data-theme', 'holiday-easter');
+                    addEasterDecorations();
+                    return;
+                }
+
+                // Великдень 2024 (5 травня)
+                if (month === 5 && day >= 4 && day <= 6) {
+                    document.documentElement.setAttribute('data-theme', 'holiday-easter');
+                    addEasterDecorations();
+                    return;
+                }
+
+                // Повернення до звичайної теми
+                const savedTheme = getCookie('theme') || getSystemTheme();
+                setTheme(savedTheme);
+            }
+
+            // Функція для додавання великодніх декорацій
+            function addEasterDecorations() {
+                const container = document.querySelector('.architecture-section');
+                const easterEmojis = ['🥚', '🐰', '🐣', '🌷', '🐥'];
+                const positions = [
+                    { top: '10%', left: '5%' },
+                    { top: '20%', right: '10%' },
+                    { top: '15%', left: '15%' },
+                    { top: '25%', right: '20%' },
+                    { top: '30%', left: '25%' }
+                ];
+
+                positions.forEach((pos, index) => {
+                    const decoration = document.createElement('div');
+                    decoration.className = 'easter-egg';
+                    decoration.textContent = easterEmojis[index];
+                    Object.assign(decoration.style, pos);
+                    container.appendChild(decoration);
+                });
+            }
+
+            // Додаємо обробник для дебаг кнопки
+            let isHolidayMode = false;
+
+            debugHolidayBtn.addEventListener('click', () => {
+                isHolidayMode = !isHolidayMode;
+                
+                if (isHolidayMode) {
+                    sessionStorage.setItem('holiday-debug', 'easter');
+                    debugHolidayBtn.classList.add('active');
+                    checkHoliday();
+                } else {
+                    sessionStorage.removeItem('holiday-debug');
+                    debugHolidayBtn.classList.remove('active');
+                    // Видаляємо всі великодні декорації
+                    document.querySelectorAll('.easter-egg').forEach(egg => egg.remove());
+                    // Повертаємо звичайну тему
+                    const savedTheme = getCookie('theme') || getSystemTheme();
+                    setTheme(savedTheme);
+                }
+            });
+
+            // Перевіряємо свята при завантаженні
+            checkHoliday();
+        });
+    </script>
+</body>
+</html> 

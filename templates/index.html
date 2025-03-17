@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpiriWile - Minecraft Сервер</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        // Реєстрація Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/js/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Функція для роботи з cookies
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + value + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // Функція для отримання системної теми
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+
+        // Функція для встановлення теми
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (document.getElementById('theme-toggle')) {
+                document.getElementById('theme-toggle').checked = theme === 'dark';
+            }
+            setCookie('theme', theme, 365); // Зберігаємо тему на рік
+        }
+
+        // Застосування початкової теми
+        const savedTheme = getCookie('theme');
+        const systemTheme = getSystemTheme();
+        const initialTheme = savedTheme || systemTheme;
+        setTheme(initialTheme);
+
+        // Слідкування за зміною системної теми
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!getCookie('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">SpiriWile</a>
+            <div class="d-flex align-items-center">
+                <button id="debug-holiday" class="btn btn-sm btn-outline-primary me-2 d-none" style="font-size: 1.2rem;" title="Активувати святковий режим">🎉</button>
+                <label class="theme-switch" title="Змінити тему">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <button class="navbar-toggler ms-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Головна</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/rules">Правила</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/architecture">Архітектура</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://send.monobank.ua/jar/6YcXYdsKaR" target="_blank">Банка</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="container">
+            <h1>Відкрийте новий світ у Minecraft</h1>
+            <p class="lead">SpiriWile - це унікальний український сервер, де кожен гравець може створити свою історію</p>
+            <div class="server-info">
+                <p class="copy-instruction">Натисніть на адресу серверу нижче, щоб скопіювати її</p>
+                <div class="server-ip-container">
+                    <code class="server-ip" id="server-ip" onclick="copyIP()" title="Натисніть щоб скопіювати">spiriwile.duckdns.org</code>
+                    <div id="copy-tooltip" class="copy-tooltip">Скопійовано!</div>
+                    <div class="server-platforms">
+                        <span class="platform java">Java</span>
+                        <span class="platform bedrock">Bedrock</span>
+                    </div>
+                </div>
+                <div class="online-status">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="server-status">Перевірка статусу...</span>
+                    </div>
+                    <span class="player-count">Зараз онлайн: <span id="total-players">-</span> гравців</span>
+                    <span class="server-version">Версія: <span id="version-info">Перевірка...</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title text-center">Особливості серверу</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Виживання</h3>
+                            <p class="card-text">SMP режим з розширеними можливостями, оптимізованими налаштуваннями та стабільною роботою.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Спільнота</h3>
+                            <p class="card-text">Дружня українська спільнота, регулярні події та активне спілкування між гравцями.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Захист</h3>
+                            <p class="card-text">Античіт система, захист від DDoS та регулярне резервне копіювання даних.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="why-us">
+        <div class="container">
+            <h2 class="section-title text-center">Ігрові можливості</h2>
+            <div class="row">
+                <div class="col-md-3 text-center mb-4">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Оптимізація</h4>
+                    <p>Стабільна робота серверу</p>
+                </div>
+                <div class="col-md-3 text-center mb-4">
+                    <div class="feature-icon">🏰</div>
+                    <h4>Клани</h4>
+                    <p>Система кланів та територій</p>
+                </div>
+                <div class="col-md-3 text-center mb-4">
+                    <div class="feature-icon">🌍</div>
+                    <h4>Кросплатформа</h4>
+                    <p>Java та Bedrock Edition</p>
+                </div>
+                <div class="col-md-3 text-center mb-4">
+                    <div class="feature-icon">🛡️</div>
+                    <h4>Безпека</h4>
+                    <p>Захист від грифінгу</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>Проект керується StrawSpirit Studio</p>
+                    <p>&copy; 2025 SpiriWile. Всі права захищені.</p>
+                </div>
+                <div class="footer-center">
+                    <div class="social-links">
+                        <a href="https://discord.gg/RhYHdDhh5y" target="_blank">Discord</a>
+                        <a href="https://t.me/spiriwile" target="_blank">Telegram</a>
+                        <a href="https://www.tiktok.com/@spiriwile" target="_blank">TikTok</a>
+                    </div>
+                </div>
+                <div class="footer-right">
+                    <p><span class="copy-ip" onclick="copyToClipboard('spiriwile.duckdns.org')" title="Натисніть щоб скопіювати">IP: spiriwile.duckdns.org</span></p>
+                    <p id="server-version">Версія: Завантаження...</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Підключення скриптів -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/copy.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/server-status.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script>
+        // Ініціалізація теми при завантаженні
+        window.themeManager.initTheme();
+    </script>
+
+    <style>
+        .copy-ip {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .copy-ip:hover {
+            background-color: var(--bg-secondary);
+        }
+
+        .tooltip {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            animation: fadeInOut 2s ease;
+            z-index: 1000;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, 20px); }
+            15% { opacity: 1; transform: translate(-50%, 0); }
+            85% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        .footer-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-left, .footer-center, .footer-right {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-left {
+            text-align: left;
+        }
+
+        .footer-center {
+            text-align: center;
+        }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        .footer-left p, .footer-right p {
+            margin: 5px 0;
+            color: var(--text-secondary);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-left, .footer-center, .footer-right {
+                text-align: center;
+                width: 100%;
+            }
+        }
+    </style>
+</body>
+</html> 
